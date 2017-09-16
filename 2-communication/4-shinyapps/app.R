@@ -58,35 +58,46 @@ library(rprojroot)
 
 root <- rprojroot::is_rstudio_project
 root_file <- root$make_fix_file()
-source(root_file('3-communication/2-shinyapps/nhood-explorer/global.R'))
+source(root_file("/2-communication/4-shinyapps/global.R"))
 
-source('global.R')
 # UI -----
 
-header <- dashboardHeader(title = "CID Opportunity Map",titleWidth = "350px")
+header <- dashboardHeader(title = "CID Opportunity Explorer",titleWidth = "350px")
 
 sidebar <- dashboardSidebar(
         width = "350px",
         shmodules::sidebarCSS(),
+        sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
+                    label = "Search..."),
         sidebarMenu(id = 'menu',
-                    shmodules::linkedBarMapSidebarTabUI('barmap1','Control Panel','first')
+                    menuItem("Community Priorties & Coming Changes",
+                             startExpanded = TRUE,
+                             tabName = "CPCC",
+                             icon = icon("building", lib = "font-awesome"),
+                             menuSubItem("Map",tabName = "map",icon = icon("globe", lib = "font-awesome")), 
+                             menuSubItem("Lists",tabName = "lists",icon = icon("list-ul", lib = "font-awesome")), 
+                             menuSubItem("Table",tabName = "table",icon = icon("table", lib = "font-awesome")),
+                             menuSubItem("Documents", tabName = "documents", icon = icon("book", lib = "font-awesome"))), 
+                    menuItem("About", tabName = "about", icon = icon("question-circle", lib = "font-awesome"))
         ),
         tags$style(HTML("p{font-size: 12px;}
-                        #barmap1-var_text{background-color: #1e282c;margin-top: 15px;}")),
+                        #barmap1-var_text{background-color: #1e282c;margin-top: 15px;}
+                        #searchButton{margin:0px;}
+                        .sidebar-form {border:0px !important;}")),
         HTML("<hr style='margin: 5px;height:1px;border-width:0;color:#404040;background-color:#404040'>"),
         HTML("<div style='padding-right: 25px;padding-left: 25px;'>"),
-        linkedBarMapSidebarTabContentUI(id = 'barmap1', 
-                                        menu_item_name = 'Control Panel 2', 
-                                        tab_name = 'first', 
-                                        vars = vars),
         HTML("</div>")
 )
 
 
 body <- shmodules::fluidDashboardBody(sidebarCollapsed = FALSE,
-        tabItems(
-                linkedBarMapBodyUI(id = 'barmap1',tab_name = 'first')
-                )
+                                      tabItems( 
+                                        tabItemContentUI_map(id = "map",tab_name = "map"),
+                                        tabItemContentUI_list(id = "list",tab_name = "lists"),
+                                        tabItemContentUI_table(id = "table",tab_name = "table"),
+                                        tabItemContentUI_documents(id = "documents",tab_name = "documents"),
+                                        tabItemContentUI_about(id = "about",tab_name = "about")
+                                      )
 )
 
 ui <- dashboardPage(header,sidebar,body, skin = 'yellow')
@@ -95,19 +106,6 @@ ui <- dashboardPage(header,sidebar,body, skin = 'yellow')
 
 server <- function(input, output, session) {
 
-        plotly_event <- reactive({event_data('plotly_selected', source = 'source')})
-
-        callModule(module = linkedBarMap,
-                   id = "barmap1",
-                   sf_rx = reactive({comb_long_sf}),
-                   vars = vars,
-                   plotly_event_rx = reactive({plotly_event()})
-        )
-        # callModule(module = shmodules::linkedScatterMap,
-        #            id = "scatmap2",
-        #            sp_rx = reactive({blocks}),
-        #            plotly_event_rx = reactive({plotly_event()})
-        # )
 }
 
 # RUN -----
