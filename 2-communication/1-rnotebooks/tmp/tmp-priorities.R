@@ -164,6 +164,12 @@ tmp_split <-
   mutate(URL = list(rep("http://gdurl.com/zdcV", times = 2))) %>% 
   mutate(POPUP = map(URL,my_slickr))
 
+write_rds(tmp_split,"./1-data/3-interim/priorities_sf.rds")
+
+
+tmp <- read_rds("./1-data/3-interim/priorities_sf.rds")
+
+
 tmp_pts <- tmp_split %>% filter(POINT_LGL)
 tmp_line <- tmp_split %>% filter(LINESTRING_LGL)
 
@@ -186,25 +192,14 @@ pop_test <- slickR(rep(test_url, times = 2),
 ) 
 
 
-mapview(tmp_pts, 
-        popup = popupGraph(tmp_pts$POPUP,type = "html",height = 380, width = 580),
+mapview(tmp, 
+        popup = popupGraph(tmp$POPUP,type = "html",height = 380, width = 580),
           options = popupOptions(maxWidth = 2000),height = 380, width = 580)
 
-leaflet() %>% 
-  addProviderTiles(provider = providers$Stamen) %>% 
-  addMarkers(data = tmp_pts, popup = ~NAME) %>% 
-  addPolylines(data = tmp_line, popup = ~NAME)
+miscgis::myLflt() %>% 
+  addMarkers(data = filter(tmp,POINT_LGL), popup = ~NAME) %>% 
+  addPolylines(data = filter(tmp, LINESTRING_LGL), popup = ~NAME)
 
 
-# let's act like breweries does not have geometries
-brewsub <- breweries[1:4,1:4,drop=TRUE]
-
-brewsub_2 <- bind_rows(brewsub,brewsub) %>% arrange(brewery)
-
-brewpub_sf <- make_an_sf(brewsub_2)
-
-test <- aggregate(brewpub_sf, list(brewpub_sf$brewery), function(x) x[1])
-
-mapview(brewpub_sf)
 
 
