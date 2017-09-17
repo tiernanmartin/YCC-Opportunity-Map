@@ -66,12 +66,16 @@ p_sf <- read_rds(root_file('1-data/3-interim/priorities_sf.rds'))
 
 
 # UI Modules -----
+
+
+
 tabItemContentUI_map <- function(id, tab_name){
   
   ns <- NS(id)
   
   tabItem(tabName = tab_name, 
-          tags$head(tags$style(HTML("\\n section.content{\\n padding:0px;\\n}\\n.outer {\\n height: calc(100vh - 50px);\\n  padding: 0px;\\n margin: 0;\\n }\\n "))), 
+          tags$head(tags$style(HTML("section.content{padding:0px;}
+                                    .outer { height: calc(100vh - 50px); padding: 0px; margin: 0; }"))), 
           tags$div(class = "outer", 
                    leafletOutput(ns("map"), 
                                  height = "100%", 
@@ -120,3 +124,11 @@ tabItemContentUI_about <- function(id, tab_name){
 
 # Server Modules -----
 
+tabItemContent_map <- function(input, output, session){
+  
+  ns <- session$ns
+  
+  output$map <- renderLeaflet({ myLflt(tile_opts = list(minZoom = 10),chinatown = TRUE) 
+    })
+  
+}

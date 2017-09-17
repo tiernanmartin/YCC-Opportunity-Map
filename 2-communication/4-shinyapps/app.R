@@ -105,6 +105,9 @@ ui <- dashboardPage(header,sidebar,body, skin = 'yellow')
 # SERVER  ------
 
 server <- function(input, output, session) {
+  
+  callModule(module = tabItemContent_map,
+             id = "map")
 
 }
 
