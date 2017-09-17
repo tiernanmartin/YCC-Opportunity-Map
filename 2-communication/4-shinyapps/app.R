@@ -65,36 +65,60 @@ source(root_file("/2-communication/4-shinyapps/global.R"))
 header <- dashboardHeader(title = "CID Opportunity Explorer",titleWidth = "350px")
 
 sidebar <- dashboardSidebar(
-        width = "350px",
-        shmodules::sidebarCSS(),
-        sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
+  width = "350px",
+  shmodules::sidebarCSS(),
+  sidebarSearchForm(textId = "searchText", buttonId = "searchButton",
                     label = "Search..."),
-        sidebarMenu(id = 'menu',
-                    menuItem("Community Priorties & Coming Changes",
-                             startExpanded = TRUE,
-                             tabName = "CPCC",
-                             icon = icon("building", lib = "font-awesome"),
-                             menuSubItem("Map",tabName = "map",icon = icon("globe", lib = "font-awesome")), 
-                             menuSubItem("Lists",tabName = "lists",icon = icon("list-ul", lib = "font-awesome")), 
-                             menuSubItem("Table",tabName = "table",icon = icon("table", lib = "font-awesome")),
-                             menuSubItem("Documents", tabName = "documents", icon = icon("book", lib = "font-awesome"))), 
-                    menuItem("About", tabName = "about", icon = icon("question-circle", lib = "font-awesome"))
-        ),
-        tags$style(HTML("p{font-size: 12px;}
+  sidebarMenu(id = 'menu',
+              menuItem("Community Priorties & Coming Changes",
+                       startExpanded = TRUE,
+                       tabName = "CPCC",
+                       icon = icon("building", lib = "font-awesome"),
+                       menuSubItem("Map",tabName = "map",icon = icon("globe", lib = "font-awesome")), 
+                       menuSubItem("Lists",tabName = "lists",icon = icon("list-ul", lib = "font-awesome")), 
+                       menuSubItem("Table",tabName = "table",icon = icon("table", lib = "font-awesome")),
+                       menuSubItem("Documents", tabName = "documents", icon = icon("book", lib = "font-awesome"))), 
+              menuItem("About", tabName = "about", icon = icon("question-circle", lib = "font-awesome"))
+  ),
+  tags$style(HTML("p{font-size: 12px;}
                         #barmap1-var_text{background-color: #1e282c;margin-top: 15px;}
                         #searchButton{margin:0px;}
                         .sidebar-form {border:0px !important;}
                         .container-fluid {padding:15px !important}")),
-        HTML("<hr style='margin: 5px;height:1px;border-width:0;color:#404040;background-color:#404040'>"),
-        HTML("<div style='padding-right: 25px;padding-left: 25px;'>"),
-        HTML("</div>")
+  HTML("<hr style='margin: 5px;height:1px;border-width:0;color:#404040;background-color:#404040'>"),
+  HTML("<div style='padding-right: 25px;padding-left: 25px;'>"),
+  HTML("</div>")
 )
 
 
 body <- shmodules::fluidDashboardBody(sidebarCollapsed = FALSE,
                                       tabItems( 
                                         tabItemContentUI_map(id = "map",tab_name = "map"),
-                                        tabItemContentUI_list(id = "list",tab_name = "lists"),
+                                        tabItem(tabName = "lists",
+                                                fluidPage(
+                                                  fluidRow(
+                                                    tabItemContentUI_list(id = "priorities",
+                                                                          radio_input_id = "radio_prior",
+                                                                          box_title = "Priorities",
+                                                                          radio_choices = pull(p_sf,NAME)),
+                                                    tabItemContentUI_list(id = "change_pri",
+                                                                          radio_input_id = "radio_pri",
+                                                                          box_title = "Changes (Private)",
+                                                                          box_status = "warning",
+                                                                          radio_choices = LETTERS),
+                                                    tabItemContentUI_list(id = "change_pub",
+                                                                          radio_input_id = "radio_pub",
+                                                                          box_title = "Changes (Public)",
+                                                                          box_status = "danger",
+                                                                          radio_choices = LETTERS),
+                                                    tagList(
+                                                      box(width = 6, title = "", 
+                                                          projectCardUI("list_proj_card")
+                                                      )
+                                                    ) 
+                                                  )
+                                                )
+                                        ),
                                         tabItemContentUI_table(id = "table",tab_name = "table"),
                                         tabItemContentUI_documents(id = "documents",tab_name = "documents"),
                                         tabItemContentUI_about(id = "about",tab_name = "about")
@@ -107,11 +131,20 @@ ui <- dashboardPage(header,sidebar,body, skin = 'yellow')
 
 server <- function(input, output, session) {
   
-  callModule(module = tabItemContent_map, id = "map")
+  # Map ----
+  callModule(module = tabItemContent_map, id = "map") 
   
+  # Lists ----
+  callModule(module = tabItemContent_list, id = "priorities", choices = pull(p_sf,NAME))
+  
+  callModule(module = tabItemContent_list, id = "change_pri" )
+  
+  callModule(module = tabItemContent_list, id = "change_pub") 
+  
+  # About ----
   callModule(module = tabItemContent_about, id = "about")
-
-}
+  
+} 
 
 # RUN -----
 

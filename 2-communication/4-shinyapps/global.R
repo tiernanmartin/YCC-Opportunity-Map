@@ -84,23 +84,16 @@ tabItemContentUI_map <- function(id, tab_name){
           )
 }
 
-tabItemContentUI_list <- function(id, tab_name){
- 
+tabItemContentUI_list <- function(id, box_width = 2, box_title = "", box_status = "primary"){
+  
   ns <- NS(id)
-  tabItem(tab_name,
-          fluidPage(
-            fluidRow(
-              box(width = 2, title = "Histogram", status = "primary"),
-              box(width = 2, title = "Inputs", status = "warning",
-                  "Box content here", br(), "More box content"),
-              box(width = 2, title = "Histogram", status = "primary"),
-              box(width = 6,title = "Histogram", status = "primary") 
-            )
-            
-          )
-          
-  )
-}
+  
+  tagList(
+    box(width = box_width, title = box_title, status = box_status, 
+        uiOutput(ns("radio_list"))
+    )
+  ) 
+} 
 
 tabItemContentUI_table <- function(id, tab_name){
     
@@ -131,7 +124,8 @@ tabItemContentUI_about <- function(id, tab_name){
               column(3),
               column(6,
                      box(width = 12, title = "About", status = "primary",
-                         uiOutput(ns("about")))
+                         uiOutput(ns("about"))
+                         )
                      ),
               column(3)
               
@@ -141,6 +135,14 @@ tabItemContentUI_about <- function(id, tab_name){
           
   )
 }
+
+projectCardUI <- function(id){
+  ns <- NS(id)
+  
+  tagList(
+    br()  # project card template goes here
+  ) 
+} 
 
 
 # Server Modules -----
@@ -164,3 +166,12 @@ tabItemContent_about <- function(input, output, session){
   
 }
 
+tabItemContent_list <- function(input, output, session, choices = LETTERS){
+   output$radio_list <- renderUI({
+      radioButtons(inputId = session$ns("btn"), 
+                 label = NULL,
+                 choices = choices,
+                 selected = character(0))
+   })
+   
+}
