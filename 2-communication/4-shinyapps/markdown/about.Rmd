@@ -1,0 +1,17 @@
+---
+output: html_document
+---
+```{r setup, include=FALSE}
+library(htmltools)
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+content <-paste0(p(lipsum::lipsum[1]), p(lipsum::lipsum[2]), p(lipsum::lipsum[3]))
+
+url <- "www.futurewise.org/"
+
+```
+
+
+
+`r content`
+
+Learn more: `r paste0("<a href=\"", url,"\"", "\ target=\"_blank", "\">", paste0("Futurewise ",shiny::icon("external-link")), "</a>")`

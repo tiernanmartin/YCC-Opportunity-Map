@@ -85,23 +85,32 @@ tabItemContentUI_map <- function(id, tab_name){
 }
 
 tabItemContentUI_list <- function(id, tab_name){
-  
+ 
   ns <- NS(id)
   tabItem(tab_name,
-          box(title = "Histogram", status = "primary"),
-          box(
-            title = "Inputs", status = "warning",
-            "Box content here", br(), "More box content"
+          fluidPage(
+            fluidRow(
+              box(width = 2, title = "Histogram", status = "primary"),
+              box(width = 2, title = "Inputs", status = "warning",
+                  "Box content here", br(), "More box content"),
+              box(width = 2, title = "Histogram", status = "primary"),
+              box(width = 6,title = "Histogram", status = "primary") 
+            )
+            
           )
+          
   )
 }
 
 tabItemContentUI_table <- function(id, tab_name){
-  
+    
   ns <- NS(id)
+  
   tabItem(tab_name,
           box(title = "Table", status = "primary")
+          
   )
+
 }
 
 tabItemContentUI_documents <- function(id, tab_name){
@@ -117,7 +126,19 @@ tabItemContentUI_about <- function(id, tab_name){
   
   ns <- NS(id)
   tabItem(tab_name,
-          box(title = "About", status = "primary")
+          fluidPage(
+            fluidRow(
+              column(3),
+              column(6,
+                     box(width = 12, title = "About", status = "primary",
+                         uiOutput(ns("about")))
+                     ),
+              column(3)
+              
+            )
+            
+          )
+          
   )
 }
 
@@ -132,3 +153,14 @@ tabItemContent_map <- function(input, output, session){
     })
   
 }
+
+tabItemContent_about <- function(input, output, session){
+  
+  ns <- session$ns
+  
+  content <- includeHTML(root_file("./2-communication/4-shinyapps/markdown/about.html"))
+  
+  output$about <- renderUI({content})
+  
+}
+

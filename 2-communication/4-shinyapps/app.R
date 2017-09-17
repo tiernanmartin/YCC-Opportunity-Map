@@ -83,7 +83,8 @@ sidebar <- dashboardSidebar(
         tags$style(HTML("p{font-size: 12px;}
                         #barmap1-var_text{background-color: #1e282c;margin-top: 15px;}
                         #searchButton{margin:0px;}
-                        .sidebar-form {border:0px !important;}")),
+                        .sidebar-form {border:0px !important;}
+                        .container-fluid {padding:15px !important}")),
         HTML("<hr style='margin: 5px;height:1px;border-width:0;color:#404040;background-color:#404040'>"),
         HTML("<div style='padding-right: 25px;padding-left: 25px;'>"),
         HTML("</div>")
@@ -106,8 +107,9 @@ ui <- dashboardPage(header,sidebar,body, skin = 'yellow')
 
 server <- function(input, output, session) {
   
-  callModule(module = tabItemContent_map,
-             id = "map")
+  callModule(module = tabItemContent_map, id = "map")
+  
+  callModule(module = tabItemContent_about, id = "about")
 
 }
 
