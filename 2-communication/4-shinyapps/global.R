@@ -89,7 +89,7 @@ tabItemContentUI_list <- function(id, box_width = 2, box_title = "", box_status 
   ns <- NS(id)
   
   tagList(
-    box(width = box_width, title = box_title, status = box_status, 
+    box(width = box_width, title = box_title, status = box_status, collapsible = TRUE,
         uiOutput(ns("radio_list"))
     )
   ) 
