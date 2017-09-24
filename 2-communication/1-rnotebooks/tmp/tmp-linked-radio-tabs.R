@@ -1,6 +1,7 @@
+library(tidyverse)
 library(shiny)
 library(shinyjs)
-library(ggvis)
+library(ggrepel)
 
 
 ui <- fluidPage(
@@ -66,6 +67,8 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
+  rx_data_head <- reactive({head(rx_data())})
+  
   rx_row <- reactive({
     switch(rx$reactInd,
            "1" = rx_data()[input$cars,],
@@ -84,7 +87,7 @@ server <- shinyServer(function(input, output, session) {
       output$cars <- renderUI({
         radioButtons("cars",
                  label = 'cars',
-                 choices = 1:nrow(cars),
+                 choices = 1:6,
                  selected = character(0))
       })
     }
@@ -94,7 +97,7 @@ server <- shinyServer(function(input, output, session) {
       output$pressure <- renderUI({
         radioButtons("pressure",
                  label = 'pressure',
-                 choices = 1:nrow(pressure),
+                 choices = 1:6,
                  selected = character(0))
       })
     }
@@ -104,7 +107,7 @@ server <- shinyServer(function(input, output, session) {
       output$faithful <- renderUI({
         radioButtons("faithful",
                  label = 'faithful',
-                 choices = 1:nrow(faithful),
+                 choices = 1:6,
                  selected = character(0))
       })
     }
@@ -127,8 +130,10 @@ server <- shinyServer(function(input, output, session) {
     req(rx$reactInd > 0)
 
     rx_data() %>% ggplot() + 
-      geom_point(aes(x,y)) +
-      geom_point(data = rx_row(), aes(x,y), color = "red", size = 5)
+      geom_point(aes(x,y), alpha = .1, size = 3) +
+      geom_point(data = rx_data_head(), aes(x,y), size = 3) + 
+      geom_text_repel(data = rx_data_head(), mapping = aes(x,y), label = 1:nrow(rx_data_head())) +
+      geom_point(data = rx_row(), aes(x,y), color = "red", size = 3)
 
 
   })
