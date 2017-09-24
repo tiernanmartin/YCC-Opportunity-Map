@@ -29,8 +29,8 @@ ui <- fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(
-      "Current dataset: ",textOutput("current",inline = TRUE),
-     verbatimTextOutput("glimpse")
+      "Current dataset: ",textOutput("current",inline = TRUE), 
+     plotOutput("plot")
     )
   )
 )
@@ -66,6 +66,17 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
+  rx_row <- reactive({
+    switch(rx$reactInd,
+           "1" = rx_data()[input$cars,],
+           "2" = rx_data()[input$pressure,],
+           "3" = rx_data()[input$faithful,])
+    
+  })
+  
+  
+# NEXT STEP: figure out how to figure out which radio option is selected
+  
   observe({ 
     
     if(rx$reactInd != 1){
@@ -73,7 +84,7 @@ server <- shinyServer(function(input, output, session) {
       output$cars <- renderUI({
         radioButtons("cars",
                  label = 'cars',
-                 choices = 1:5,
+                 choices = 1:nrow(cars),
                  selected = character(0))
       })
     }
@@ -83,7 +94,7 @@ server <- shinyServer(function(input, output, session) {
       output$pressure <- renderUI({
         radioButtons("pressure",
                  label = 'pressure',
-                 choices = 1:5,
+                 choices = 1:nrow(pressure),
                  selected = character(0))
       })
     }
@@ -93,7 +104,7 @@ server <- shinyServer(function(input, output, session) {
       output$faithful <- renderUI({
         radioButtons("faithful",
                  label = 'faithful',
-                 choices = 1:5,
+                 choices = 1:nrow(faithful),
                  selected = character(0))
       })
     }
@@ -110,13 +121,14 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
-  # rx_data() %>% ggvis(~x, ~y) %>% layer_points() %>% bind_shiny("plot")
   
-  output$glimpse <- renderPrint({
+   output$plot <- renderPlot({
 
     req(rx$reactInd > 0)
 
-    rx_data() %>% glimpse()
+    rx_data() %>% ggplot() + 
+      geom_point(aes(x,y)) +
+      geom_point(data = rx_row(), aes(x,y), color = "red", size = 5)
 
 
   })
